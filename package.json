@@ -5,10 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p ${PORT:-3000}"
+    "start": "next start -p ${PORT:-8080}",
+    "postinstall": "next build"
   },
   "dependencies": {
-    "better-sqlite3": "^13.0.3",
     "next": "^15.5.28",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

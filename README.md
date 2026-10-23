@@ -1,6 +1,6 @@
 # Votação de Cargos (igreja)
 
-Sistema simples de votação secreta para cargos de ministérios. Next.js 15 + SQLite (arquivo local).
+Sistema simples de votação secreta para cargos de ministérios. Next.js 15 + SQLite embutido no Node (`node:sqlite`, sem módulo nativo). Requer Node 22.13 ou superior.
 
 ## Telas
 
@@ -65,15 +65,24 @@ npm run dev                  # http://localhost:3000
 
 ## Publicar no SaveInCloud (Jelastic)
 
-1. Crie um ambiente **Node.js** (versão 20 ou 22).
-2. Envie o projeto (Git ou upload) para a pasta `ROOT` do nó.
-3. Em **Variables** do nó, defina:
-   - `ADMIN_PASSWORD` só se quiser outra senha; sem ela vale `admin123`
-   - `COOKIE_SECURE` = `1` (se usar HTTPS/SSL no ambiente)
-   - `DATA_DIR` = pasta persistente para o banco, por exemplo `/home/jelastic/data`
-   - `PORT` já vem definido pelo Jelastic (normalmente `8080`); o `npm start` o respeita.
-4. Em **Entry Point / Start command**, use `npm run build && npm start`
-   (ou rode o `npm run build` uma vez via SSH e deixe só `npm start`).
-5. Reinicie o nó e acesse `https://seu-ambiente.../admin`.
+Ambiente testado: **Node.js 26 + PM2** (stack `pm2-almalinux-9`). Também funciona com Node 22 LTS.
 
-O arquivo `voto.db` fica em `DATA_DIR`. Faça backup dele antes de redeploys.
+1. Em **Implementações** (Deployments) do ambiente, clique em **Adicionar repositório Git**:
+   - URL: `https://github.com/claudiopontes/iasdnomeacao.git`
+   - Branch: `main`
+   - Marque **Auto deploy** se quiser publicar a cada push.
+2. Clique em **Implantar** no repositório, para a pasta `ROOT`. O SaveInCloud roda `npm install`,
+   que por sua vez executa `next build` (script `postinstall`). O PM2 lê o `ecosystem.config.js`
+   e inicia `next start` na porta 8080.
+3. Em **Variables** (ícone de engrenagem do nó, "Variáveis") defina:
+   - `DATA_DIR` = `/home/jelastic/data` (fora da pasta ROOT, para o banco sobreviver a redeploys)
+   - `COOKIE_SECURE` = `1` (o ambiente já tem SSL)
+   - `ADMIN_PASSWORD` só se quiser outra senha; sem ela vale `admin123`
+4. Reinicie o nó e acesse `https://iasdnomeacao.sp1.br.saveincloud.net.br/admin`.
+
+O arquivo `voto.db` ficará em `DATA_DIR`. Faça backup dele antes de trocar a versão do Node ou recriar o nó.
+
+### Se precisar inspecionar
+
+- Logs: ícone **Log** do nó, arquivo `pm2` / `run.log`.
+- Terminal SSH do nó: `pm2 list`, `pm2 logs`, `pm2 restart iasdnomeacao`.
