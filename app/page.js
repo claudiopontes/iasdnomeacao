@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Cabecalho from './Cabecalho';
+import Simbolo from './Simbolo';
 
 export default function Votacao() {
   const [lista, setLista] = useState(null);
@@ -10,19 +12,35 @@ export default function Votacao() {
   }
   useEffect(() => { carregar(); }, []);
 
+  // nome da igreja local: o das votações abertas, se todas forem da mesma igreja
+  const igrejas = [...new Set((lista || []).map(v => v.igreja).filter(Boolean))];
+  const igreja = igrejas.length === 1 ? igrejas[0] : '';
+
   return (
     <>
-      <header>
-        <h1>Votação de Cargos</h1>
+      <Cabecalho titulo="Votação de Cargos" igreja={igreja}>
         <button className="link" onClick={carregar}>Atualizar</button>
-      </header>
+      </Cabecalho>
       <main>
         {lista === null && <div className="vazio">Carregando…</div>}
         {lista?.length === 0 && (
-          <div className="vazio">Nenhuma votação aberta no momento.<br />Aguarde o administrador.</div>
+          <div className="vazio">
+            <div className="vazio-icone"><Simbolo size={72} /></div>
+            Nenhuma votação aberta no momento.<br />Aguarde a orientação da mesa e toque em Atualizar.
+          </div>
+        )}
+        {lista?.length > 0 && (
+          <div className="aviso">
+            <span aria-hidden="true">🔒</span>
+            <div><strong>Seu voto é secreto.</strong>Nenhum dado pessoal é registrado. Cada aparelho vota uma vez em cada cargo.</div>
+          </div>
         )}
         {lista?.map(v => <Cedula key={v.id} v={v} aoVotar={carregar} />)}
       </main>
+      <footer className="rodape">
+        <Simbolo size={22} color="#9aa9b4" />
+        Sistema de votação · Comissão de Nomeações
+      </footer>
     </>
   );
 }
@@ -68,11 +86,13 @@ function Cedula({ v, aoVotar }) {
 
   return (
     <div className="card">
-      {v.igreja && <div className="sub" style={{ marginBottom: 2 }}>{v.igreja}</div>}
-      <h2>{v.ministerio}</h2>
-      <div className="sub">
-        Cargo: <strong>{v.cargo}</strong>{v.mandato ? ` · Mandato ${v.mandato}` : ''} · {multipla ? `Escolha até ${limite} nome(s)` : 'Escolha apenas 1 nome'}
+      <div className="cedula-topo">
+        <h2>{v.ministerio}</h2>
+        <div className="sub">
+          Cargo: <strong>{v.cargo}</strong>{v.mandato ? ` · Mandato ${v.mandato}` : ''}
+        </div>
       </div>
+      <div className="sub">{multipla ? `Escolha até ${limite} nome(s)` : 'Escolha apenas 1 nome'}</div>
       <form onSubmit={votar}>
         {v.candidatos.map(c => (
           <label key={c.id} className="opcao">

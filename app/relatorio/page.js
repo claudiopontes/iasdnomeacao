@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Cabecalho from '../Cabecalho';
 
 export default function Relatorio() {
   const [linhas, setLinhas] = useState(null);
@@ -25,13 +26,10 @@ export default function Relatorio() {
 
   return (
     <>
-      <header>
-        <h1>Relatório de Resultados</h1>
-        <nav>
+      <Cabecalho titulo="Relatório de Resultados">
           <a href="/admin">Administração</a>
           <a href="/api/admin/resultados.csv">Baixar CSV</a>
-        </nav>
-      </header>
+      </Cabecalho>
       <main>
         {semAcesso && <div className="msg erro">Faça login na <a href="/admin">administração</a> para ver o relatório.</div>}
         {linhas && (

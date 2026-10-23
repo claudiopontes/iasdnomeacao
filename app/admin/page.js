@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Cabecalho from '../Cabecalho';
 
 const rotulo = { rascunho: 'Rascunho', aberta: 'Aberta', encerrada: 'Encerrada', confirmada: 'Confirmada' };
 const descTipo = v => v.tipo === 'unica' ? 'Escolha única' : `Escolha múltipla (até ${v.max_escolhas})`;
@@ -23,14 +24,11 @@ export default function Admin() {
 
   return (
     <>
-      <header>
-        <h1>Administração</h1>
-        <nav>
+      <Cabecalho titulo="Administração">
           <a href="/" target="_blank" rel="noreferrer">Tela de votação</a>
           <a href="/relatorio">Relatório</a>
           {autenticado && <button className="link" onClick={sair}>Sair</button>}
-        </nav>
-      </header>
+      </Cabecalho>
       <main>
         {autenticado === null && <div className="vazio">Carregando…</div>}
         {autenticado === false && <Login aoEntrar={() => { setAutenticado(true); setTela({ nome: 'lista' }); }} />}
